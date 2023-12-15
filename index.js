@@ -81,9 +81,7 @@ app.get("/scrape", async (req, res) => {
   }
   try {
     const scrapedContent = await scrapeSection(url);
-    res.json({
-      content: scrapedContent,
-    });
+    res.send(scrapedContent);
   } catch (error) {
     res.json({
       error: "Something went wrong while scraping the page.",
