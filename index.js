@@ -10,9 +10,8 @@ if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
   puppeteer = require("puppeteer");
 }
 
-app.get("/api", async (req, res) => {
+async function scrapeSection(url) {
   let options = {};
-
   if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
     options = {
       args: [...chrome.args, "--hide-scrollbars", "--disable-web-security"],
@@ -22,21 +21,66 @@ app.get("/api", async (req, res) => {
       ignoreHTTPSErrors: true,
     };
   }
-
   try {
-    let browser = await puppeteer.launch(options);
+    const browser = await puppeteer.launch(options);
+    const page = await browser.newPage();
+    page.setDefaultNavigationTimeout(120000);
+    await page.goto(url);
+    await page.waitForSelector("body");
 
-    let page = await browser.newPage();
-    await page.goto("https://www.google.com");
-    res.send(await page.title());
-  } catch (err) {
-    console.error(err);
-    return null;
+    // Extract the plain HTML content of the specific section
+    const sectionContent = await page.evaluate(() => {
+      const section = document.querySelector("body");
+      if (section && "innerText" in section) {
+        return section.innerText;
+      } else {
+        throw new Error("Section content not found on the page.");
+      }
+    });
+
+    if (sectionContent) {
+      // Remove the \n characters and unnecessary spaces
+      const cleanedContent = sectionContent
+        .replace(/\n/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+      return cleanedContent;
+    } else {
+      console.log("Section content not found on the page.");
+    }
+    await browser.close();
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+app.get("/", (req, res) => {
+  res.json({
+    message: "Hello World!",
+  });
+});
+
+app.get("/scrape", async (req, res) => {
+  const { url } = req.query;
+  if (!url) {
+    return res.json({
+      error: "You need to provide a URL.",
+    });
+  }
+  try {
+    const scrapedContent = await scrapeSection(url);
+    res.json({
+      content: scrapedContent,
+    });
+  } catch (error) {
+    res.json({
+      error: "Something went wrong while scraping the page.",
+    });
   }
 });
 
 app.listen(process.env.PORT || 3000, () => {
-  console.log("Server started");
+  console.log("Server started at http://localhost:3000");
 });
 
 module.exports = app;
