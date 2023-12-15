@@ -1,16 +1,22 @@
-const express = require('express');
+const express = require("express");
 const cors = require("cors");
 
 const app = express();
-require('dotenv').config();
+require("dotenv").config();
 
 app.use(cors());
 
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://coverlettergenerator-ericstrohmaier.vercel.app');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://coverlettergenerator-ericstrohmaier.vercel.app"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   next();
 });
 let chrome = {};
@@ -25,6 +31,7 @@ if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
 
 async function scrapeSection(url) {
   let options = {};
+  let browser;
   const auth = process.env.SUPERPROXY_AUTH;
   if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
     options = {
@@ -33,12 +40,13 @@ async function scrapeSection(url) {
       executablePath: await chrome.executablePath,
       headless: true,
       ignoreHTTPSErrors: true,
-      browserWSEndpoint: `wss://${auth}@brd.superproxy.io:9222`,
     };
   }
   try {
-
-    const browser = await puppeteer.launch(options);
+    browser = await puppeteer.connect({
+      browserWSEndpoint: `wss://${auth}@brd.superproxy.io:9222`,
+    });
+    browser = await puppeteer.launch(options);
     const page = await browser.newPage();
     page.setDefaultNavigationTimeout(120000);
     await page.goto(url);
@@ -93,8 +101,8 @@ app.get("/scrape", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log("Server started at http://localhost:3000");
+app.listen(process.env.PORT || 3003, () => {
+  console.log(`Server listening on port ${process.env.PORT || 3003}`);
 });
 
 module.exports = app;
