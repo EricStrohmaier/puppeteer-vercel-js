@@ -1,5 +1,7 @@
 const app = require("express")();
+const cors = require("cors");
 
+app.use(cors());
 let chrome = {};
 let puppeteer;
 
