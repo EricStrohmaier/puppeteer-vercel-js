@@ -43,9 +43,9 @@ async function scrapeSection(url) {
     };
   }
   try {
-    browser = await puppeteer.connect({
-      browserWSEndpoint: `wss://${auth}@brd.superproxy.io:9222`,
-    });
+    // browser = await puppeteer.connect({
+    //   browserWSEndpoint: `wss://${auth}@brd.superproxy.io:9222`,
+    // });
     browser = await puppeteer.launch(options);
     const page = await browser.newPage();
     page.setDefaultNavigationTimeout(120000);
