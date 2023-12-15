@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require("cors");
 
 const app = express();
+require('dotenv').config();
 
 app.use(cors());
 
@@ -24,6 +25,7 @@ if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
 
 async function scrapeSection(url) {
   let options = {};
+  const auth = process.env.SUPERPROXY_AUTH;
   if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
     options = {
       args: [...chrome.args, "--hide-scrollbars", "--disable-web-security"],
@@ -31,9 +33,11 @@ async function scrapeSection(url) {
       executablePath: await chrome.executablePath,
       headless: true,
       ignoreHTTPSErrors: true,
+      browserWSEndpoint: `wss://${auth}@brd.superproxy.io:9222`,
     };
   }
   try {
+
     const browser = await puppeteer.launch(options);
     const page = await browser.newPage();
     page.setDefaultNavigationTimeout(120000);
