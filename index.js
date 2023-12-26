@@ -25,7 +25,8 @@ let puppeteer;
 if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
   chrome = require("chrome-aws-lambda");
   // puppeteer = require("puppeteer-core");
-  const puppeteer = require('puppeteer-extra')
+  puppeteer = require('puppeteer-extra')
+  console.log("hello aws?!");
 
 } else {
   // puppeteer = require("puppeteer");
