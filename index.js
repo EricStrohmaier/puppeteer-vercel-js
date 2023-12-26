@@ -24,10 +24,16 @@ let puppeteer;
 
 if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
   chrome = require("chrome-aws-lambda");
-  puppeteer = require("puppeteer-core");
+  // puppeteer = require("puppeteer-core");
+  const puppeteer = require('puppeteer-extra')
+
 } else {
-  puppeteer = require("puppeteer");
+  // puppeteer = require("puppeteer");
+  puppeteer = require('puppeteer-extra')
+
 }
+const StealthPlugin = require('puppeteer-extra-plugin-stealth')
+puppeteer.use(StealthPlugin())
 
 async function scrapeSection(url) {
   let options = {};
@@ -46,6 +52,7 @@ async function scrapeSection(url) {
     // browser = await puppeteer.connect({
     //   browserWSEndpoint: `wss://${auth}@brd.superproxy.io:9222`,
     // });
+    // console.log(browser);
     browser = await puppeteer.launch(options);
     const page = await browser.newPage();
     page.setDefaultNavigationTimeout(120000);
