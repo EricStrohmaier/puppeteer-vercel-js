@@ -31,7 +31,7 @@ if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
 } else {
   // puppeteer = require("puppeteer");
   puppeteer = require('puppeteer-extra')
-
+  console.log("not aws");
 }
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 puppeteer.use(StealthPlugin())
