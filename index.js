@@ -49,6 +49,7 @@ async function scrapeSection(url) {
       ignoreHTTPSErrors: true,
     };
   }
+  
   try {
     // browser = await puppeteer.connect({
     //   browserWSEndpoint: `wss://${auth}@brd.superproxy.io:9222`,
@@ -88,7 +89,7 @@ async function scrapeSection(url) {
 
 app.get("/", (req, res) => {
   res.json({
-    message: "Hello World!",
+    message: "Hello World! Use /scrape?url=https://example.com to scrape a page content.",
   });
 });
 
@@ -96,7 +97,7 @@ app.get("/scrape", async (req, res) => {
   const { url } = req.query;
   if (!url) {
     return res.json({
-      error: "You need to provide a URL.",
+      error: "You need to provide a URL. /scrape?url=https://example.com",
     });
   }
   try {
