@@ -97,7 +97,7 @@ app.get("/scrape", async (req, res) => {
   const { url } = req.query;
   if (!url) {
     return res.json({
-      error: "You need to provide a URL. /scrape?url=https://example.com",
+      error: "You need to provide a URL. /scrape?url=/scrape?url=http.....",
     });
   }
   try {
